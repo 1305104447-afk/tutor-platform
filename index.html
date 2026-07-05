@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -6,81 +6,87 @@
 <title>大学生家教平台</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
-
-.navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,.15); position: sticky; top: 0; z-index: 1000; }
-.navbar h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
-.navbar .nav-btns { display: flex; gap: 10px; }
-.navbar .nav-btns button { padding: 8px 18px; border: 2px solid rgba(255,255,255,.6); border-radius: 20px; background: transparent; color: white; cursor: pointer; font-size: 14px; transition: .2s; }
-.navbar .nav-btns button:hover, .navbar .nav-btns button.active { background: rgba(255,255,255,.2); border-color: white; }
-
-.container { max-width: 1300px; margin: 0 auto; padding: 20px; }
-.panel { display: none; }
-.panel.active { display: block; }
-
-.home-hero { text-align: center; padding: 80px 20px 50px; }
-.home-hero h2 { font-size: 32px; color: #667eea; margin-bottom: 12px; }
-.home-hero p { font-size: 16px; color: #666; max-width: 500px; margin: 0 auto 40px; line-height: 1.6; }
-.entry-cards { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; }
-.entry-card { background: white; border-radius: 16px; padding: 40px 30px; width: 280px; text-align: center; cursor: pointer; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-.entry-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.14); }
-.entry-card .icon { font-size: 56px; margin-bottom: 16px; }
-.entry-card h3 { font-size: 20px; margin-bottom: 8px; }
-.entry-card p { font-size: 14px; color: #888; }
-.entry-card.parent { border-top: 4px solid #f59e0b; }
-.entry-card.student { border-top: 4px solid #3b82f6; }
-
-.form-section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-.form-section h3 { font-size: 18px; margin-bottom: 16px; color: #667eea; }
-.form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.form-row input, .form-row select, .form-row textarea { flex: 1; min-width: 180px; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
-.form-row textarea { resize: vertical; min-height: 80px; }
-.form-row label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #555; white-space: nowrap; }
-.btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; transition: .2s; }
-.btn-primary { background: #667eea; color: white; }
-.btn-primary:hover { background: #5a6fd6; }
-.btn-warning { background: #f59e0b; color: white; }
-.btn-warning:hover { background: #d97706; }
-.btn-danger { background: #ef4444; color: white; }
-.btn-danger:hover { background: #dc2626; }
-
-.map-container { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 20px; }
-.map-box { height: 450px; border-radius: 8px; z-index: 1; }
-
-.list-section { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-.list-section h3 { font-size: 18px; margin-bottom: 16px; color: #667eea; }
-.card-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.info-card { border: 1px solid #eee; border-radius: 10px; padding: 16px; transition: .2s; }
-.info-card:hover { border-color: #667eea; box-shadow: 0 2px 8px rgba(102,126,234,.15); }
-.info-card h4 { font-size: 16px; margin-bottom: 6px; color: #333; }
-.info-card .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin: 3px 3px 3px 0; }
-.tag-subject { background: #dbeafe; color: #1d4ed8; }
-.tag-grade { background: #fef3c7; color: #92400e; }
-.tag-gender { background: #fce7f3; color: #be185d; }
-.tag-price { background: #d1fae5; color: #065f46; }
-.info-card .detail { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
-.info-card .time { font-size: 12px; color: #aaa; margin-top: 8px; }
-.info-card .actions { margin-top: 10px; display: flex; gap: 8px; }
-.empty { text-align: center; color: #aaa; padding: 40px; font-size: 15px; }
-
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 2000; justify-content: center; align-items: center; }
-.modal-overlay.show { display: flex; }
-.modal { background: white; border-radius: 14px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
-.modal h3 { margin-bottom: 16px; color: #667eea; }
-.modal .info-row { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-.modal .info-row strong { color: #555; display: inline-block; width: 80px; }
-.modal .close-btn { float: right; background: none; border: none; font-size: 22px; cursor: pointer; color: #999; }
-
-.location-hint { font-size: 13px; color: #888; margin-top: 6px; }
-.location-hint span { color: #667eea; font-weight: 600; }
-
-@media (max-width: 768px) {
-  .entry-cards { flex-direction: column; align-items: center; }
-  .entry-card { width: 90%; }
-  .form-row { flex-direction: column; }
-  .form-row input, .form-row select { min-width: auto; }
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f0f4f8;color:#333;min-height:100vh}
+.navbar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.15);position:sticky;top:0;z-index:1000}
+.navbar h1{font-size:20px;font-weight:700;letter-spacing:1px}
+.navbar .nav-btns{display:flex;gap:8px;align-items:center}
+.navbar .nav-btns button{padding:7px 16px;border:2px solid rgba(255,255,255,.6);border-radius:20px;background:transparent;color:white;cursor:pointer;font-size:13px;transition:.2s}
+.navbar .nav-btns button:hover,.navbar .nav-btns button.active{background:rgba(255,255,255,.2);border-color:white}
+.user-badge{display:none;align-items:center;gap:8px;font-size:13px;background:rgba(255,255,255,.15);padding:6px 14px;border-radius:20px}
+.user-badge .logout-btn{cursor:pointer;margin-left:4px;opacity:.7;font-size:16px}
+.user-badge .logout-btn:hover{opacity:1}
+.container{max-width:1300px;margin:0 auto;padding:20px}
+.panel{display:none}.panel.active{display:block}
+.home-hero{text-align:center;padding:80px 20px 50px}
+.home-hero h2{font-size:32px;color:#667eea;margin-bottom:12px}
+.home-hero p{font-size:16px;color:#666;max-width:500px;margin:0 auto 40px;line-height:1.6}
+.entry-cards{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+.entry-card{background:white;border-radius:16px;padding:40px 30px;width:280px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.entry-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.14)}
+.entry-card .icon{font-size:56px;margin-bottom:16px}
+.entry-card h3{font-size:20px;margin-bottom:8px}
+.entry-card p{font-size:14px;color:#888}
+.entry-card.parent{border-top:4px solid #f59e0b}
+.entry-card.student{border-top:4px solid #3b82f6}
+.need-login{text-align:center;padding:60px 20px;color:#999}
+.need-login .icon{font-size:48px;margin-bottom:12px}
+.need-login p{margin-bottom:16px}
+.form-section{background:white;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.form-section h3{font-size:18px;margin-bottom:16px;color:#667eea}
+.form-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.form-row input,.form-row select,.form-row textarea{flex:1;min-width:180px;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit}
+.form-row textarea{resize:vertical;min-height:80px}
+.form-row label{display:flex;align-items:center;gap:6px;font-size:14px;color:#555;white-space:nowrap}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600;transition:.2s}
+.btn-primary{background:#667eea;color:white}.btn-primary:hover{background:#5a6fd6}
+.btn-warning{background:#f59e0b;color:white}.btn-warning:hover{background:#d97706}
+.btn-danger{background:#ef4444;color:white}.btn-danger:hover{background:#dc2626}
+.btn-success{background:#10b981;color:white}.btn-success:hover{background:#059669}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.map-wrap{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:20px}
+.map-search-box{display:flex;gap:8px;margin-bottom:12px}
+.map-search-box input{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+.map-search-results{max-height:200px;overflow-y:auto;margin-bottom:8px;display:none;background:white;border:1px solid #ddd;border-radius:8px}
+.map-search-results .result-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0}
+.map-search-results .result-item:hover{background:#f0f4ff}
+.map-box{height:450px;border-radius:8px;z-index:1}
+.map-toolbar{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.location-hint{font-size:13px;color:#888}
+.location-hint span{color:#667eea;font-weight:600}
+.list-section{background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.list-section h3{font-size:18px;margin-bottom:16px;color:#667eea}
+.card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.info-card{border:1px solid #eee;border-radius:10px;padding:16px;transition:.2s}
+.info-card:hover{border-color:#667eea;box-shadow:0 2px 8px rgba(102,126,234,.15)}
+.info-card h4{font-size:16px;margin-bottom:6px;color:#333}
+.info-card .tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;margin:3px 3px 3px 0}
+.tag-subject{background:#dbeafe;color:#1d4ed8}
+.tag-grade{background:#fef3c7;color:#92400e}
+.tag-gender{background:#fce7f3;color:#be185d}
+.tag-price{background:#d1fae5;color:#065f46}
+.info-card .detail{font-size:13px;color:#666;margin-top:6px;line-height:1.5}
+.info-card .time{font-size:12px;color:#aaa;margin-top:8px}
+.info-card .actions{margin-top:10px;display:flex;gap:8px}
+.empty{text-align:center;color:#aaa;padding:40px;font-size:15px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:white;border-radius:14px;padding:30px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto}
+.modal h3{margin-bottom:6px;color:#667eea;font-size:20px}
+.modal .subtitle{color:#888;font-size:13px;margin-bottom:20px}
+.modal .close-btn{float:right;background:none;border:none;font-size:24px;cursor:pointer;color:#999;line-height:1}
+.modal .input-group{margin-bottom:14px}
+.modal .input-group label{display:block;font-size:13px;color:#555;margin-bottom:4px;font-weight:600}
+.modal .input-group input{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+.modal .input-group .hint{font-size:11px;color:#999;margin-top:3px}
+.modal .sms-row{display:flex;gap:8px}
+.modal .sms-row input{flex:1;font-size:18px;letter-spacing:6px;text-align:center}
+.modal .sms-row button{white-space:nowrap}
+.modal .error-msg{color:#ef4444;font-size:12px;margin-top:2px;display:none}
+.modal .login-switch{text-align:center;margin-top:16px;font-size:13px;color:#888}
+.modal .login-switch a{color:#667eea;cursor:pointer;font-weight:600}
+@media(max-width:768px){.entry-cards{flex-direction:column;align-items:center}.entry-card{width:90%}.form-row{flex-direction:column}.form-row input,.form-row select{min-width:auto}.navbar h1{font-size:16px}.navbar .nav-btns button{padding:5px 10px;font-size:12px}}
 </style>
 </head>
 <body>
@@ -91,16 +97,20 @@ body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f
     <button id="navHome" class="active" onclick="switchPanel('home')">🏠 首页</button>
     <button id="navParent" onclick="switchPanel('parent')">👨‍👩‍👧 家长入口</button>
     <button id="navStudent" onclick="switchPanel('student')">🎓 学生入口</button>
+    <span class="user-badge" id="userBadge">
+      📱 <span id="userPhone"></span>
+      <span class="logout-btn" onclick="logout()" title="退出登录">✕</span>
+    </span>
+    <button id="loginBtn" onclick="openAuthModal()" style="background:rgba(255,255,255,.2);border-color:white;">📱 登录/注册</button>
   </div>
 </nav>
 
 <div class="container">
 
-  <!-- ═══ 首页 ═══ -->
   <div id="panelHome" class="panel active">
     <div class="home-hero">
       <h2>找到最合适的大学生家教</h2>
-      <p>基于真实地理位置，让家长和学生在地图上相互发现。<br>1公里精度——保护隐私的同时精准匹配。</p>
+      <p>手机号注册，地图精准匹配。<br>1公里精度——保护隐私的同时高效连接。</p>
       <div class="entry-cards">
         <div class="entry-card parent" onclick="switchPanel('parent')">
           <div class="icon">👨‍👩‍👧</div>
@@ -116,374 +126,358 @@ body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f
     </div>
   </div>
 
-  <!-- ═══ 家长端 ═══ -->
   <div id="panelParent" class="panel">
-    <div class="form-section">
-      <h3>📝 发布家教需求</h3>
-      <div class="form-row">
-        <input type="text" id="pName" placeholder="您的称呼">
-        <input type="text" id="pPhone" placeholder="联系电话">
-      </div>
-      <div class="form-row">
-        <select id="pSubject"><option value="">选择科目</option><option>数学</option><option>英语</option><option>语文</option><option>物理</option><option>化学</option><option>生物</option><option>历史</option><option>地理</option><option>编程</option><option>其他</option></select>
-        <select id="pGrade"><option value="">选择年级</option><option>小学</option><option>初中</option><option>高中</option><option>大学</option></select>
-        <input type="text" id="pPrice" placeholder="预算（元/小时）">
-      </div>
-      <div class="form-row">
-        <textarea id="pNote" placeholder="补充说明（如上课时间、孩子情况等）"></textarea>
-      </div>
-      <div class="form-row">
-        <label>📍 点击地图选择您的大致位置（1km精度，不会暴露精确地址）</label>
-      </div>
-      <div class="location-hint">已选位置：<span id="pLocation">尚未选择</span></div>
-      <div style="margin-top:12px">
-        <button class="btn btn-warning" onclick="publishParent()">✅ 发布需求</button>
-      </div>
+    <div id="parentNeedLogin" class="need-login">
+      <div class="icon">🔒</div>
+      <p>请先登录后再发布家教需求</p>
+      <button class="btn btn-primary" onclick="openAuthModal()">📱 手机号登录/注册</button>
     </div>
-    <div class="map-container"><div id="mapParent" class="map-box"></div></div>
-    <div class="list-section">
-      <h3>🎓 附近的大学生家教</h3>
-      <div class="card-list" id="studentList"></div>
+    <div id="parentLoggedIn" style="display:none">
+      <div class="form-section">
+        <h3>📝 发布家教需求</h3>
+        <div class="form-row">
+          <input type="text" id="pName" placeholder="您的称呼">
+          <input type="text" id="pContactPhone" placeholder="联系电话">
+        </div>
+        <div class="form-row">
+          <select id="pSubject"><option value="">选择科目</option><option>数学</option><option>英语</option><option>语文</option><option>物理</option><option>化学</option><option>生物</option><option>历史</option><option>地理</option><option>编程</option><option>其他</option></select>
+          <select id="pGrade"><option value="">选择年级</option><option>小学</option><option>初中</option><option>高中</option><option>大学</option></select>
+          <input type="text" id="pPrice" placeholder="预算（元/小时）">
+        </div>
+        <div class="form-row">
+          <textarea id="pNote" placeholder="补充说明（如上课时间、孩子情况等）"></textarea>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <div class="map-search-box">
+          <input type="text" id="parentSearchInput" placeholder="🔍 搜索地址（如：北京大学、朝阳区）" onkeydown="if(event.key==='Enter')searchAddress('parent')">
+          <button class="btn btn-primary btn-sm" onclick="searchAddress('parent')">搜索</button>
+          <button class="btn btn-success btn-sm" onclick="requestLocation()" title="使用我的当前位置">📍 定位</button>
+        </div>
+        <div class="map-search-results" id="parentSearchResults"></div>
+        <div class="map-box" id="mapParent"></div>
+        <div class="map-toolbar">
+          <span class="location-hint">📍 已选位置：<span id="pLocation">点击地图选择</span></span>
+          <button class="btn btn-warning btn-sm" onclick="publishParent()">✅ 发布需求</button>
+        </div>
+      </div>
+      <div class="list-section">
+        <h3>🎓 附近的大学生家教</h3>
+        <div class="card-list" id="studentList"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ═══ 学生端 ═══ -->
   <div id="panelStudent" class="panel">
-    <div class="form-section">
-      <h3>📝 填写个人资料</h3>
-      <div class="form-row">
-        <input type="text" id="sName" placeholder="你的姓名">
-        <input type="text" id="sPhone" placeholder="联系电话">
-      </div>
-      <div class="form-row">
-        <input type="text" id="sSchool" placeholder="所在大学">
-        <input type="text" id="sMajor" placeholder="专业">
-      </div>
-      <div class="form-row">
-        <select id="sSubject"><option value="">擅长科目</option><option>数学</option><option>英语</option><option>语文</option><option>物理</option><option>化学</option><option>生物</option><option>历史</option><option>地理</option><option>编程</option><option>其他</option></select>
-        <select id="sGrade"><option value="">可教年级</option><option>小学</option><option>初中</option><option>高中</option></select>
-        <input type="text" id="sPrice" placeholder="期望时薪（元/小时）">
-      </div>
-      <div class="form-row">
-        <select id="sGender"><option value="">性别</option><option>男</option><option>女</option></select>
-        <input type="text" id="sAge" placeholder="年龄">
-      </div>
-      <div class="form-row">
-        <textarea id="sBio" placeholder="自我介绍（教学经验、获奖情况等）"></textarea>
-      </div>
-      <div class="form-row">
-        <label>📍 点击地图选择你的大致位置（1km精度）</label>
-      </div>
-      <div class="location-hint">已选位置：<span id="sLocation">尚未选择</span></div>
-      <div style="margin-top:12px">
-        <button class="btn btn-primary" onclick="publishStudent()">✅ 发布资料</button>
-      </div>
+    <div id="studentNeedLogin" class="need-login">
+      <div class="icon">🔒</div>
+      <p>请先登录后再填写个人资料</p>
+      <button class="btn btn-primary" onclick="openAuthModal()">📱 手机号登录/注册</button>
     </div>
-    <div class="map-container"><div id="mapStudent" class="map-box"></div></div>
-    <div class="list-section">
-      <h3>👨‍👩‍👧 附近的家教需求</h3>
-      <div class="card-list" id="parentList"></div>
+    <div id="studentLoggedIn" style="display:none">
+      <div class="form-section">
+        <h3>📝 填写个人资料</h3>
+        <div class="form-row">
+          <input type="text" id="sName" placeholder="你的姓名">
+          <input type="text" id="sContactPhone" placeholder="联系电话">
+        </div>
+        <div class="form-row">
+          <input type="text" id="sSchool" placeholder="所在大学">
+          <input type="text" id="sMajor" placeholder="专业">
+        </div>
+        <div class="form-row">
+          <select id="sSubject"><option value="">擅长科目</option><option>数学</option><option>英语</option><option>语文</option><option>物理</option><option>化学</option><option>生物</option><option>历史</option><option>地理</option><option>编程</option><option>其他</option></select>
+          <select id="sGrade"><option value="">可教年级</option><option>小学</option><option>初中</option><option>高中</option></select>
+          <input type="text" id="sPrice" placeholder="期望时薪（元/小时）">
+        </div>
+        <div class="form-row">
+          <select id="sGender"><option value="">性别</option><option>男</option><option>女</option></select>
+          <input type="text" id="sAge" placeholder="年龄">
+        </div>
+        <div class="form-row">
+          <textarea id="sBio" placeholder="自我介绍（教学经验、获奖情况等）"></textarea>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <div class="map-search-box">
+          <input type="text" id="studentSearchInput" placeholder="🔍 搜索地址（如：清华大学、海淀区）" onkeydown="if(event.key==='Enter')searchAddress('student')">
+          <button class="btn btn-primary btn-sm" onclick="searchAddress('student')">搜索</button>
+          <button class="btn btn-success btn-sm" onclick="requestLocation()" title="使用我的当前位置">📍 定位</button>
+        </div>
+        <div class="map-search-results" id="studentSearchResults"></div>
+        <div class="map-box" id="mapStudent"></div>
+        <div class="map-toolbar">
+          <span class="location-hint">📍 已选位置：<span id="sLocation">点击地图选择</span></span>
+          <button class="btn btn-primary btn-sm" onclick="publishStudent()">✅ 发布资料</button>
+        </div>
+      </div>
+      <div class="list-section">
+        <h3>👨‍👩‍👧 附近的家教需求</h3>
+        <div class="card-list" id="parentList"></div>
+      </div>
     </div>
   </div>
 
 </div>
 
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" id="modalContent"></div>
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+    <div id="authStep1">
+      <h3>📱 手机号登录/注册</h3>
+      <p class="subtitle">未注册手机号将自动创建账号</p>
+      <div class="input-group">
+        <label>手机号码</label>
+        <input type="tel" id="authPhone" placeholder="请输入手机号" maxlength="11">
+        <div class="error-msg" id="phoneError">请输入正确的11位手机号</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="sendVerifyCode()">获取短信验证码</button>
+    </div>
+    <div id="authStep2" style="display:none">
+      <h3>📱 输入验证码</h3>
+      <p class="subtitle">验证码已发送至 <strong id="authPhoneDisplay"></strong></p>
+      <div class="input-group sms-row">
+        <input type="text" id="authCode" placeholder="6位验证码" maxlength="6">
+        <button class="btn btn-primary btn-sm" id="resendBtn" onclick="sendVerifyCode()" disabled>60s后重发</button>
+      </div>
+      <div class="error-msg" id="codeError">验证码错误，请重新输入</div>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="verifyCode()">✅ 验证并登录</button>
+      <p class="login-switch"><a onclick="backToStep1()">← 更换手机号</a></p>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ═══════════════════════════
-//         数据存储
-// ═══════════════════════════
-const STORAGE_KEY = 'tutor_platform_data';
-let appData = { parents: [], students: [] };
 
-function loadData() {
-  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) appData = JSON.parse(raw); }
-  catch(e) { appData = { parents: [], students: [] }; }
-}
-function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+const STORAGE_KEY='tutor_platform_v2';
+let appData={parents:[],students:[],users:{},smsCodes:{}};
+let currentUser=null,currentPanel='home';
+let map=null,markersLayer=null,pendingLat=null,pendingLng=null;
+function loadData(){try{let r=localStorage.getItem(STORAGE_KEY);if(r)appData=JSON.parse(r)}catch(e){appData={parents:[],students:[],users:{},smsCodes:{}}}}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(appData))}
 loadData();
+(function(){let p=localStorage.getItem('tutor_logged_in_phone');if(p&&appData.users[p]){currentUser={phone:p,...appData.users[p]};updateAuthUI()}})();
 
-// ═══════════════════════════
-//         地图管理
-// ═══════════════════════════
-let map = null, markersLayer = null;
-let pendingLat = null, pendingLng = null;
-let currentPanel = 'home';
-
-function destroyMap() {
-  if (map) { map.remove(); map = null; markersLayer = null; }
+let countdownTimer=null;
+function sendVerifyCode(){
+  let phone=document.getElementById('authPhone').value.replace(/\s/g,'');
+  if(!/^1[3-9]\d{9}$/.test(phone)){document.getElementById('phoneError').style.display='block';return}
+  document.getElementById('phoneError').style.display='none';
+  let code=String(Math.floor(100000+Math.random()*900000));
+  appData.smsCodes[phone]={code:code,expires:Date.now()+300000};
+  saveData();
+  alert('📱 【演示模式】\n验证码已发送至 '+phone+'\n\n🔑 验证码：'+code+'\n\n（正式上线后接入真实短信API）');
+  document.getElementById('authStep1').style.display='none';
+  document.getElementById('authStep2').style.display='block';
+  document.getElementById('authPhoneDisplay').textContent=phone;
+  let sec=60,btn=document.getElementById('resendBtn');
+  btn.disabled=true;
+  if(countdownTimer)clearInterval(countdownTimer);
+  countdownTimer=setInterval(function(){sec--;btn.textContent=sec+'s后重发';if(sec<=0){clearInterval(countdownTimer);btn.textContent='重新发送';btn.disabled=false}},1000);
 }
+function backToStep1(){
+  document.getElementById('authStep1').style.display='block';
+  document.getElementById('authStep2').style.display='none';
+  if(countdownTimer)clearInterval(countdownTimer);
+}
+function verifyCode(){
+  let phone=document.getElementById('authPhone').value.replace(/\s/g,'');
+  let code=document.getElementById('authCode').value.trim();
+  let stored=appData.smsCodes[phone];
+  if(!stored||stored.code!==code||Date.now()>stored.expires){document.getElementById('codeError').style.display='block';return}
+  if(!appData.users[phone]){appData.users[phone]={phone:phone,createdAt:new Date().toISOString()}}
+  delete appData.smsCodes[phone];saveData();
+  currentUser={phone:phone,...appData.users[phone]};
+  localStorage.setItem('tutor_logged_in_phone',phone);
+  updateAuthUI();closeAuthModal();switchPanel(currentPanel);
+  alert('✅ 登录成功！欢迎使用家教平台');
+}
+function logout(){
+  if(!confirm('确定退出登录吗？'))return;
+  currentUser=null;localStorage.removeItem('tutor_logged_in_phone');
+  updateAuthUI();switchPanel('home');
+}
+function updateAuthUI(){
+  let badge=document.getElementById('userBadge'),loginBtn=document.getElementById('loginBtn');
+  if(currentUser){badge.style.display='flex';document.getElementById('userPhone').textContent=currentUser.phone;loginBtn.style.display='none'}
+  else{badge.style.display='none';loginBtn.style.display='inline-block'}
+  if(currentPanel==='parent')updateParentView();
+  if(currentPanel==='student')updateStudentView();
+}
+function openAuthModal(){
+  document.getElementById('authModal').classList.add('show');
+  document.getElementById('authStep1').style.display='block';
+  document.getElementById('authStep2').style.display='none';
+  document.getElementById('authCode').value='';
+  document.getElementById('phoneError').style.display='none';
+  document.getElementById('codeError').style.display='none';
+  if(countdownTimer){clearInterval(countdownTimer);document.getElementById('resendBtn').disabled=false;document.getElementById('resendBtn').textContent='重新发送'}
+}
+function closeAuthModal(){document.getElementById('authModal').classList.remove('show')}
 
-function createMap(divId) {
+const DEFAULT_CENTER=[39.9042,116.4074];
+function destroyMap(){if(map){map.remove();map=null;markersLayer=null}}
+function createMap(divId){
   destroyMap();
-
-  const defaultCenter = [39.9042, 116.4074];
-  map = L.map(divId, { center: defaultCenter, zoom: 14, zoomControl: true });
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 18
-  }).addTo(map);
-
-  L.control.scale({ metric: true, imperial: false, maxWidth: 160, position: 'bottomleft' }).addTo(map);
-
-  markersLayer = L.layerGroup().addTo(map);
-
-  map.on('click', function(e) {
-    pendingLat = e.latlng.lat;
-    pendingLng = e.latlng.lng;
-    updateLocationDisplay();
-    refreshMarkers();
-    L.circleMarker([pendingLat, pendingLng], {
-      radius: 10, color: '#10b981', fillColor: '#34d399',
-      fillOpacity: 0.7, weight: 3
-    }).addTo(markersLayer).bindPopup('📍 您选择的位置（即将发布）').openPopup();
+  map=L.map(divId,{center:DEFAULT_CENTER,zoom:14,zoomControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors',maxZoom:18}).addTo(map);
+  L.control.scale({metric:true,imperial:false,maxWidth:160,position:'bottomleft'}).addTo(map);
+  markersLayer=L.layerGroup().addTo(map);
+  map.on('click',function(e){
+    pendingLat=e.latlng.lat;pendingLng=e.latlng.lng;
+    updateLocationDisplay();refreshMarkers();
+    L.circleMarker([pendingLat,pendingLng],{radius:10,color:'#10b981',fillColor:'#34d399',fillOpacity:.7,weight:3}).addTo(markersLayer).bindPopup('📍 已选位置').openPopup();
   });
-
   refreshMarkers();
 }
-
-function updateLocationDisplay() {
-  if (pendingLat == null || pendingLng == null) return;
-  const text = pendingLat.toFixed(4) + ', ' + pendingLng.toFixed(4);
-  var pEl = document.getElementById('pLocation');
-  var sEl = document.getElementById('sLocation');
-  if (pEl) pEl.textContent = text;
-  if (sEl) sEl.textContent = text;
+function updateLocationDisplay(){
+  if(pendingLat==null||pendingLng==null)return;
+  let text=pendingLat.toFixed(4)+', '+pendingLng.toFixed(4);
+  let pEl=document.getElementById('pLocation'),sEl=document.getElementById('sLocation');
+  if(pEl)pEl.textContent=text;if(sEl)sEl.textContent=text;
 }
-
-function refreshMarkers() {
-  if (!markersLayer) return;
-  markersLayer.eachLayer(function(layer) {
-    if (layer._isDataMarker) markersLayer.removeLayer(layer);
+function refreshMarkers(){
+  if(!markersLayer)return;
+  markersLayer.eachLayer(function(l){if(l._isDataMarker)markersLayer.removeLayer(l)});
+  appData.students.forEach(function(s){
+    let m=L.circleMarker([s.lat,s.lng],{radius:9,color:'#2563eb',fillColor:'#3b82f6',fillOpacity:.85,weight:2.5}).addTo(markersLayer);
+    m._isDataMarker=true;
+    m.bindPopup('<b>🎓 '+eschtml(s.name)+'</b><br>'+eschtml(s.school)+' · '+eschtml(s.subject)+'<br>💰 '+s.price+'元/小时');
   });
-
-  appData.students.forEach(function(s) {
-    var m = L.circleMarker([s.lat, s.lng], {
-      radius: 9, color: '#2563eb', fillColor: '#3b82f6',
-      fillOpacity: 0.85, weight: 2.5
-    }).addTo(markersLayer);
-    m._isDataMarker = true;
-    m.bindPopup('<b>🎓 ' + escapeHtml(s.name) + '</b><br>' + escapeHtml(s.school) + ' · ' + escapeHtml(s.subject) + '<br>💰 ' + s.price + '元/小时');
-  });
-
-  appData.parents.forEach(function(p) {
-    var m = L.circleMarker([p.lat, p.lng], {
-      radius: 9, color: '#d97706', fillColor: '#f59e0b',
-      fillOpacity: 0.85, weight: 2.5
-    }).addTo(markersLayer);
-    m._isDataMarker = true;
-    m.bindPopup('<b>👨‍👩‍👧 ' + escapeHtml(p.name) + '</b><br>' + escapeHtml(p.subject) + ' · ' + escapeHtml(p.grade) + '<br>💰 ' + p.price + '元/小时');
+  appData.parents.forEach(function(p){
+    let m=L.circleMarker([p.lat,p.lng],{radius:9,color:'#d97706',fillColor:'#f59e0b',fillOpacity:.85,weight:2.5}).addTo(markersLayer);
+    m._isDataMarker=true;
+    m.bindPopup('<b>👨‍👩‍👧 '+eschtml(p.name)+'</b><br>'+eschtml(p.subject)+' · '+eschtml(p.grade)+'<br>💰 '+p.price+'元/小时');
   });
 }
 
-// ═══════════════════════════
-//         面板切换
-// ═══════════════════════════
-function switchPanel(panel) {
-  currentPanel = panel;
-  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.nav-btns button').forEach(function(b) { b.classList.remove('active'); });
+async function searchAddress(role){
+  let inputId=role==='parent'?'parentSearchInput':'studentSearchInput';
+  let resultsId=role==='parent'?'parentSearchResults':'studentSearchResults';
+  let query=document.getElementById(inputId).value.trim();
+  if(!query)return;
+  try{
+    let url='https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(query)+'&limit=5&accept-language=zh';
+    let resp=await fetch(url),results=await resp.json();
+    let container=document.getElementById(resultsId);
+    if(results.length===0){container.innerHTML='<div class="result-item" style="color:#999">未找到匹配地址</div>';container.style.display='block';return}
+    container.innerHTML=results.map(function(r){return '<div class="result-item" onclick="selectSearchResult('+r.lat+','+r.lon+',\''+eschtml(r.display_name)+'\',\''+role+'\')">📍 '+eschtml(r.display_name)+'</div>'}).join('');
+    container.style.display='block';
+  }catch(e){alert('搜索失败，请检查网络连接')}
+}
+function selectSearchResult(lat,lng,name,role){
+  if(!map)return;
+  map.setView([lat,lng],16);
+  pendingLat=lat;pendingLng=lng;
+  updateLocationDisplay();refreshMarkers();
+  L.marker([lat,lng]).addTo(markersLayer).bindPopup('📍 '+name).openPopup();
+  let resultsId=role==='parent'?'parentSearchResults':'studentSearchResults';
+  document.getElementById(resultsId).style.display='none';
+  document.getElementById(role==='parent'?'parentSearchInput':'studentSearchInput').value=name.substring(0,30)+'...';
+}
 
-  var panelMap = { home: 'panelHome', parent: 'panelParent', student: 'panelStudent' };
-  var btnMap = { home: 'navHome', parent: 'navParent', student: 'navStudent' };
+function requestLocation(){
+  if(!navigator.geolocation){alert('您的浏览器不支持定位功能');return}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      let lat=pos.coords.latitude,lng=pos.coords.longitude,acc=pos.coords.accuracy;
+      if(!map)return;
+      map.setView([lat,lng],15);
+      pendingLat=lat;pendingLng=lng;
+      updateLocationDisplay();refreshMarkers();
+      L.circle([lat,lng],{radius:acc,color:'#10b981',fillColor:'#34d399',fillOpacity:.15,weight:1}).addTo(markersLayer);
+      L.circleMarker([lat,lng],{radius:8,color:'#10b981',fillColor:'#34d399',fillOpacity:.9,weight:3}).addTo(markersLayer).bindPopup('📍 我的位置（精度约'+Math.round(acc)+'米）').openPopup();
+    },
+    function(err){
+      let msg='定位失败：';
+      switch(err.code){case err.PERMISSION_DENIED:msg+='您拒绝了定位请求。请在浏览器设置中允许定位权限。';break;case err.POSITION_UNAVAILABLE:msg+='无法获取位置信息。';break;case err.TIMEOUT:msg+='定位请求超时。';break;default:msg+='未知错误。'}
+      alert(msg);
+    },
+    {enableHighAccuracy:false,timeout:10000,maximumAge:60000}
+  );
+}
 
-  document.getElementById(panelMap[panel]).classList.add('active');
-  document.getElementById(btnMap[panel]).classList.add('active');
+function switchPanel(panel){
+  currentPanel=panel;
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nav-btns button').forEach(function(b){b.classList.remove('active')});
+  let pm={home:'panelHome',parent:'panelParent',student:'panelStudent'};
+  let bm={home:'navHome',parent:'navParent',student:'navStudent'};
+  document.getElementById(pm[panel]).classList.add('active');
+  document.getElementById(bm[panel]).classList.add('active');
+  if(panel==='parent')updateParentView();
+  else if(panel==='student')updateStudentView();
+  else destroyMap();
+}
+function updateParentView(){
+  if(currentUser){document.getElementById('parentNeedLogin').style.display='none';document.getElementById('parentLoggedIn').style.display='block';createMap('mapParent');renderLists()}
+  else{document.getElementById('parentNeedLogin').style.display='block';document.getElementById('parentLoggedIn').style.display='none';destroyMap()}
+}
+function updateStudentView(){
+  if(currentUser){document.getElementById('studentNeedLogin').style.display='none';document.getElementById('studentLoggedIn').style.display='block';createMap('mapStudent');renderLists()}
+  else{document.getElementById('studentNeedLogin').style.display='block';document.getElementById('studentLoggedIn').style.display='none';destroyMap()}
+}
 
-  if (panel === 'parent') {
-    createMap('mapParent');
-    renderLists();
-  } else if (panel === 'student') {
-    createMap('mapStudent');
-    renderLists();
-  } else {
-    destroyMap();
+function publishParent(){
+  if(!currentUser){alert('请先登录');openAuthModal();return}
+  let name=document.getElementById('pName').value.trim();
+  let phone2=document.getElementById('pContactPhone').value.trim()||currentUser.phone;
+  let subject=document.getElementById('pSubject').value;
+  let grade=document.getElementById('pGrade').value;
+  let price=document.getElementById('pPrice').value.trim();
+  let note=document.getElementById('pNote').value.trim();
+  if(!name||!subject||!grade||!price){alert('请填写所有必填字段（称呼、科目、年级、预算）');return}
+  if(pendingLat==null||pendingLng==null){alert('请在地图上选择位置（可搜索地址或点击地图）');return}
+  appData.parents.push({id:Date.now(),type:'parent',userId:currentUser.phone,name:name,phone:phone2,subject:subject,grade:grade,price:price,note:note,lat:pendingLat,lng:pendingLng,time:new Date().toLocaleString('zh-CN')});
+  saveData();refreshMarkers();renderLists();
+  ['pName','pContactPhone','pSubject','pGrade','pPrice','pNote'].forEach(function(id){let el=document.getElementById(id);if(el)el.value=''});
+  alert('✅ 需求发布成功！');
+}
+function publishStudent(){
+  if(!currentUser){alert('请先登录');openAuthModal();return}
+  let name=document.getElementById('sName').value.trim();
+  let phone2=document.getElementById('sContactPhone').value.trim()||currentUser.phone;
+  let school=document.getElementById('sSchool').value.trim();
+  let major=document.getElementById('sMajor').value.trim();
+  let subject=document.getElementById('sSubject').value;
+  let grade=document.getElementById('sGrade').value;
+  let price=document.getElementById('sPrice').value.trim();
+  let gender=document.getElementById('sGender').value;
+  let age=document.getElementById('sAge').value.trim();
+  let bio=document.getElementById('sBio').value.trim();
+  if(!name||!school||!subject||!grade||!price){alert('请填写所有必填字段（姓名、大学、科目、可教年级、期望时薪）');return}
+  if(pendingLat==null||pendingLng==null){alert('请在地图上选择位置（可搜索地址或点击地图）');return}
+  appData.students.push({id:Date.now(),type:'student',userId:currentUser.phone,name:name,phone:phone2,school:school,major:major,subject:subject,grade:grade,price:price,gender:gender,age:age,bio:bio,lat:pendingLat,lng:pendingLng,time:new Date().toLocaleString('zh-CN')});
+  saveData();refreshMarkers();renderLists();
+  ['sName','sContactPhone','sSchool','sMajor','sSubject','sGrade','sPrice','sGender','sAge','sBio'].forEach(function(id){let el=document.getElementById(id);if(el)el.value=''});
+  alert('✅ 资料发布成功！');
+}
+
+function renderLists(){
+  let sl=document.getElementById('studentList');
+  if(sl){
+    if(appData.students.length===0){sl.innerHTML='<div class="empty">暂无大学生家教信息</div>'}
+    else{sl.innerHTML=appData.students.map(function(s){return '<div class="info-card"><h4>🎓 '+eschtml(s.name)+' <span class="tag tag-gender">'+(s.gender||'未知')+'</span></h4><div><span class="tag tag-subject">'+eschtml(s.subject)+'</span> <span class="tag tag-grade">'+eschtml(s.grade)+'</span> <span class="tag tag-price">'+s.price+'元/时</span></div><div class="detail">🏫 '+eschtml(s.school)+' · '+eschtml(s.major||'')+' · '+(s.age||'')+'岁</div><div class="detail">📞 '+eschtml(s.phone)+'</div><div class="detail">'+eschtml(s.bio||'')+'</div><div class="time">📍 ('+s.lat.toFixed(2)+', '+s.lng.toFixed(2)+') · '+s.time+'</div><div class="actions"><button class="btn btn-primary btn-sm" onclick="focusMarker('+s.lat+','+s.lng+')">📍 地图查看</button> '+(currentUser&&currentUser.phone===s.userId?'<button class="btn btn-danger btn-sm" onclick="deleteItem(\'students\','+s.id+')">🗑 删除</button>':'')+'</div></div>'}).join('')}
+  }
+  let pl=document.getElementById('parentList');
+  if(pl){
+    if(appData.parents.length===0){pl.innerHTML='<div class="empty">暂无家教需求</div>'}
+    else{pl.innerHTML=appData.parents.map(function(p){return '<div class="info-card"><h4>👨‍👩‍👧 '+eschtml(p.name)+'</h4><div><span class="tag tag-subject">'+eschtml(p.subject)+'</span> <span class="tag tag-grade">'+eschtml(p.grade)+'</span> <span class="tag tag-price">'+p.price+'元/时</span></div><div class="detail">📞 '+eschtml(p.phone)+'</div><div class="detail">'+eschtml(p.note||'')+'</div><div class="time">📍 ('+p.lat.toFixed(2)+', '+p.lng.toFixed(2)+') · '+p.time+'</div><div class="actions"><button class="btn btn-primary btn-sm" onclick="focusMarker('+p.lat+','+p.lng+')">📍 地图查看</button> '+(currentUser&&currentUser.phone===p.userId?'<button class="btn btn-danger btn-sm" onclick="deleteItem(\'parents\','+p.id+')">🗑 删除</button>':'')+'</div></div>'}).join('')}
   }
 }
-
-// ═══════════════════════════
-//         发布
-// ═══════════════════════════
-function publishParent() {
-  var name = document.getElementById('pName').value.trim();
-  var phone = document.getElementById('pPhone').value.trim();
-  var subject = document.getElementById('pSubject').value;
-  var grade = document.getElementById('pGrade').value;
-  var price = document.getElementById('pPrice').value.trim();
-  var note = document.getElementById('pNote').value.trim();
-
-  if (!name || !phone || !subject || !grade || !price) {
-    alert('请填写所有必填字段（称呼、电话、科目、年级、预算）');
-    return;
-  }
-  if (pendingLat == null || pendingLng == null) {
-    alert('请在地图上点击选择您的大致位置');
-    return;
-  }
-
-  appData.parents.push({
-    id: Date.now(), type: 'parent',
-    name: name, phone: phone, subject: subject, grade: grade, price: price, note: note,
-    lat: pendingLat, lng: pendingLng,
-    time: new Date().toLocaleString('zh-CN')
-  });
-
-  saveData();
-  refreshMarkers();
-  renderLists();
-  clearParentForm();
-  alert('需求发布成功！');
+function focusMarker(lat,lng){
+  if(!map)return;map.setView([lat,lng],16);
+  markersLayer.eachLayer(function(l){if(l.getLatLng&&l.getLatLng().lat===lat&&l.getLatLng().lng===lng)l.openPopup()});
 }
-
-function publishStudent() {
-  var name = document.getElementById('sName').value.trim();
-  var phone = document.getElementById('sPhone').value.trim();
-  var school = document.getElementById('sSchool').value.trim();
-  var major = document.getElementById('sMajor').value.trim();
-  var subject = document.getElementById('sSubject').value;
-  var grade = document.getElementById('sGrade').value;
-  var price = document.getElementById('sPrice').value.trim();
-  var gender = document.getElementById('sGender').value;
-  var age = document.getElementById('sAge').value.trim();
-  var bio = document.getElementById('sBio').value.trim();
-
-  if (!name || !phone || !school || !subject || !grade || !price) {
-    alert('请填写所有必填字段（姓名、电话、大学、科目、可教年级、期望时薪）');
-    return;
-  }
-  if (pendingLat == null || pendingLng == null) {
-    alert('请在地图上点击选择你的大致位置');
-    return;
-  }
-
-  appData.students.push({
-    id: Date.now(), type: 'student',
-    name: name, phone: phone, school: school, major: major,
-    subject: subject, grade: grade, price: price,
-    gender: gender, age: age, bio: bio,
-    lat: pendingLat, lng: pendingLng,
-    time: new Date().toLocaleString('zh-CN')
-  });
-
-  saveData();
-  refreshMarkers();
-  renderLists();
-  clearStudentForm();
-  alert('资料发布成功！');
+function deleteItem(type,id){
+  if(!confirm('确定删除这条信息吗？'))return;
+  if(type==='parents')appData.parents=appData.parents.filter(function(p){return p.id!==id});
+  else appData.students=appData.students.filter(function(s){return s.id!==id});
+  saveData();refreshMarkers();renderLists();
 }
-
-function clearParentForm() {
-  ['pName','pPhone','pSubject','pGrade','pPrice','pNote'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
-}
-
-function clearStudentForm() {
-  ['sName','sPhone','sSchool','sMajor','sSubject','sGrade','sPrice','sGender','sAge','sBio'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
-}
-
-// ═══════════════════════════
-//         列表渲染
-// ═══════════════════════════
-function renderLists() {
-  var studentList = document.getElementById('studentList');
-  if (studentList) {
-    if (appData.students.length === 0) {
-      studentList.innerHTML = '<div class="empty">暂无大学生家教信息</div>';
-    } else {
-      studentList.innerHTML = appData.students.map(function(s) {
-        return '<div class="info-card">' +
-          '<h4>🎓 ' + escapeHtml(s.name) + ' <span class="tag tag-gender">' + (s.gender||'未知') + '</span></h4>' +
-          '<div>' +
-            '<span class="tag tag-subject">' + escapeHtml(s.subject) + '</span> ' +
-            '<span class="tag tag-grade">' + escapeHtml(s.grade) + '</span> ' +
-            '<span class="tag tag-price">' + s.price + '元/时</span>' +
-          '</div>' +
-          '<div class="detail">🏫 ' + escapeHtml(s.school) + ' · ' + escapeHtml(s.major||'') + ' · ' + (s.age||'') + '岁</div>' +
-          '<div class="detail">📞 ' + escapeHtml(s.phone) + '</div>' +
-          '<div class="detail">' + escapeHtml(s.bio||'') + '</div>' +
-          '<div class="time">📍 (' + s.lat.toFixed(2) + ', ' + s.lng.toFixed(2) + ') · ' + s.time + '</div>' +
-          '<div class="actions">' +
-            '<button class="btn btn-primary" style="padding:5px 14px;font-size:12px" onclick="focusMarker(' + s.lat + ',' + s.lng + ')">📍 在地图查看</button> ' +
-            '<button class="btn btn-danger" style="padding:5px 14px;font-size:12px" onclick="deleteItem(\'students\',' + s.id + ')">🗑 删除</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-  }
-
-  var parentList = document.getElementById('parentList');
-  if (parentList) {
-    if (appData.parents.length === 0) {
-      parentList.innerHTML = '<div class="empty">暂无家教需求</div>';
-    } else {
-      parentList.innerHTML = appData.parents.map(function(p) {
-        return '<div class="info-card">' +
-          '<h4>👨‍👩‍👧 ' + escapeHtml(p.name) + '</h4>' +
-          '<div>' +
-            '<span class="tag tag-subject">' + escapeHtml(p.subject) + '</span> ' +
-            '<span class="tag tag-grade">' + escapeHtml(p.grade) + '</span> ' +
-            '<span class="tag tag-price">' + p.price + '元/时</span>' +
-          '</div>' +
-          '<div class="detail">📞 ' + escapeHtml(p.phone) + '</div>' +
-          '<div class="detail">' + escapeHtml(p.note||'') + '</div>' +
-          '<div class="time">📍 (' + p.lat.toFixed(2) + ', ' + p.lng.toFixed(2) + ') · ' + p.time + '</div>' +
-          '<div class="actions">' +
-            '<button class="btn btn-primary" style="padding:5px 14px;font-size:12px" onclick="focusMarker(' + p.lat + ',' + p.lng + ')">📍 在地图查看</button> ' +
-            '<button class="btn btn-danger" style="padding:5px 14px;font-size:12px" onclick="deleteItem(\'parents\',' + p.id + ')">🗑 删除</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-  }
-}
-
-function focusMarker(lat, lng) {
-  if (!map) return;
-  map.setView([lat, lng], 16);
-  markersLayer.eachLayer(function(layer) {
-    if (layer.getLatLng && layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
-      layer.openPopup();
-    }
-  });
-}
-
-function deleteItem(type, id) {
-  if (!confirm('确定删除这条信息吗？')) return;
-  if (type === 'parents') {
-    appData.parents = appData.parents.filter(function(p) { return p.id !== id; });
-  } else {
-    appData.students = appData.students.filter(function(s) { return s.id !== id; });
-  }
-  saveData();
-  refreshMarkers();
-  renderLists();
-}
-
-// ═══════════════════════════
-//         弹窗
-// ═══════════════════════════
-function closeModal(e) {
-  if (e && e.target !== document.getElementById('modalOverlay')) return;
-  document.getElementById('modalOverlay').classList.remove('show');
-}
-
-function escapeHtml(str) {
-  var div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
-}
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('show');
-});
+function eschtml(str){let d=document.createElement('div');d.textContent=str||'';return d.innerHTML}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('authModal').classList.remove('show')}});
 </script>
 </body>
 </html>
